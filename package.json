@@ -25,7 +25,16 @@
   "homepage": "https://github.com/mvcbox/node-pck-archive#readme",
   "dependencies": {
     "@types/node": "^12.7.8",
+    "bluebird": "^3.5.5",
     "file-reader-writer": "^1.0.0",
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.4",
+    "iconv-lite": "^0.5.0",
     "typescript": "^3.6.3"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.27",
+    "@types/fs-extra": "^8.0.0",
+    "@types/glob": "^7.1.1"
   }
 }
