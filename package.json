@@ -1,0 +1,31 @@
+{
+  "name": "pck-archive",
+  "version": "1.0.0",
+  "description": "Node PCK archive",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node ./node_modules/typescript/bin/tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mvcbox/node-pck-archive.git"
+  },
+  "keywords": [
+    "Node",
+    "PCK",
+    "archive"
+  ],
+  "author": "mvcbox.org@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mvcbox/node-pck-archive/issues"
+  },
+  "homepage": "https://github.com/mvcbox/node-pck-archive#readme",
+  "dependencies": {
+    "@types/node": "^12.7.8",
+    "file-reader-writer": "^1.0.0",
+    "typescript": "^3.6.3"
+  }
+}
