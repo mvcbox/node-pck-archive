@@ -26,7 +26,7 @@ export class PckReader {
         this.fr = new FileReader(this.archive);
         await this.fr.init();
         this.filesCount = await this.fr.setPointer(this.fr.length - 8).readInt32LE();
-        this.fileTablePointer = (await this.fr.setPointer(this.fr.length - 272).readInt32LE()) ^ this.key1;
+        this.fileTablePointer = (await this.fr.setPointer(this.fr.length - 272).readUInt32LE()) ^ this.key1;
         return this.readFileTable();
     }
 
@@ -41,7 +41,8 @@ export class PckReader {
         for (let i = 0; i < this.filesCount; ++i) {
             this.fr.offset(4);
             const entrySize = (await this.fr.readInt32LE()) ^ this.key2;
-            this.fileTable.push(new FileTableEntry(await this.fr.read(entrySize)));
+            const fileEntry = new FileTableEntry(await this.fr.read(entrySize));
+            this.fileTable.push(fileEntry);
         }
     }
 

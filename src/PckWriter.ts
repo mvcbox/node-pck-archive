@@ -71,18 +71,20 @@ export class PckWriter {
 
         const fileTablePointer = this.fw.pointer;
 
+        let counter = 0;
         for (const fileEntry of fileTable) {
             const buffer = fileEntry.pack(level);
             await this.fw.writeInt32LE(buffer.length ^ this.key1);
             await this.fw.writeInt32LE(buffer.length ^ this.key2);
             await this.fw.write(buffer);
             await this.fw.writeInt32LE(0);
+            ++counter;
         }
 
         await this.fw.writeInt32LE(ASIG_1);
         await this.fw.writeInt16LE(2);
         await this.fw.writeInt16LE(2);
-        await this.fw.writeInt32LE(fileTablePointer ^ KEY_1);
+        await this.fw.writeInt32LE(fileTablePointer ^ this.key1);
         await this.fw.writeInt32LE(0);
         await this.fw.writeString('Angelica File Package, Perfect World.', 'ascii');
         const nuller = Buffer.alloc ? Buffer.alloc(215) : new Buffer(215);
