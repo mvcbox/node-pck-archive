@@ -3,4 +3,5 @@ export type FileTableEntryOptions = Buffer | {
     dataOffset: number;
     dataDecompressedSize: number;
     dataCompressedSize: number;
+    entrySize?: number;
 };

@@ -49,7 +49,7 @@ export class PckWriter {
             let data = fs.readFileSync(file);
             const entryDataDecompressedSize = data.length;
             let entryDataCompressedSize = data.length;
-            const data2 = zlib.gzipSync(data, {
+            const data2 = zlib.deflateSync(data, {
                 level: level,
                 memLevel: level
             });
@@ -71,14 +71,11 @@ export class PckWriter {
 
         const fileTablePointer = this.fw.pointer;
 
-        let counter = 0;
         for (const fileEntry of fileTable) {
             const buffer = fileEntry.pack(level);
             await this.fw.writeInt32LE(buffer.length ^ this.key1);
             await this.fw.writeInt32LE(buffer.length ^ this.key2);
             await this.fw.write(buffer);
-            await this.fw.writeInt32LE(0);
-            ++counter;
         }
 
         await this.fw.writeInt32LE(ASIG_1);
@@ -86,9 +83,13 @@ export class PckWriter {
         await this.fw.writeInt16LE(2);
         await this.fw.writeInt32LE(fileTablePointer ^ this.key1);
         await this.fw.writeInt32LE(0);
-        await this.fw.writeString('Angelica File Package, Perfect World.', 'ascii');
-        const nuller = Buffer.alloc ? Buffer.alloc(215) : new Buffer(215);
-        await this.fw.write(nuller);
+
+        const copyright = 'Angelica File Package, Perfect World.';
+        const buffer = Buffer.alloc ? Buffer.alloc(256) : new Buffer(256);
+        const string = Buffer.from ? Buffer.from(copyright, 'ascii') : new Buffer(copyright, 'ascii');
+        string.copy(buffer);
+        await this.fw.write(buffer);
+
         await this.fw.writeInt32LE(ASIG_2);
         await this.fw.writeInt32LE(fileTable.length);
         await this.fw.writeInt16LE(2);
