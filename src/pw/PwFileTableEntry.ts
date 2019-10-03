@@ -1,15 +1,15 @@
 import zlib from 'zlib';
 import iconv from 'iconv-lite';
-import { FileTableEntryOptions } from './FileTableEntryOptions';
+import { PwFileTableEntryOptions } from './PwFileTableEntryOptions';
 
-export class FileTableEntry {
+export class PwFileTableEntry {
     public path: string;
     public dataOffset: number;
     public dataDecompressedSize: number;
     public dataCompressedSize: number;
     public entrySize: number;
 
-    public constructor(options: FileTableEntryOptions) {
+    public constructor(options: PwFileTableEntryOptions) {
         if (options instanceof Buffer) {
             try {
                 options = zlib.unzipSync(options);

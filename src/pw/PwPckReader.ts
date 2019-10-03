@@ -1,29 +1,28 @@
 import zlib from 'zlib';
 import path from 'path';
 import fs from 'fs-extra';
-import { KEY_1, KEY_2 } from './constants';
+import { PW_KEY_1, PW_KEY_2 } from './constants';
 import { FileReader } from 'file-reader-writer';
-import { FileTableEntry } from './FileTableEntry';
-import { PckReaderOptions } from './PckReaderOptions';
+import { PwFileTableEntry } from './PwFileTableEntry';
+import { PwPckReaderOptions } from './PwPckReaderOptions';
 
-export class PckReader {
+export class PwPckReader {
     public key1: number;
     public key2: number;
     public fr: FileReader;
-    public filesCount: number = 0;
-    public archive: number | string;
-    public fileTablePointer: number = 0;
-    public fileTable: FileTableEntry[] = [];
+    public filesCount: number = -1;
+    public isLegasy: boolean = false;
+    public fileTablePointer: number = -1;
+    public fileTable: PwFileTableEntry[] = [];
 
-    constructor(archive: number | string, options?: PckReaderOptions) {
-        this.archive = archive;
+    constructor(archive: number | string, options?: PwPckReaderOptions) {
         options = options || {};
-        this.key1 = typeof options.key1 === 'number' ? options.key1 : KEY_1;
-        this.key2 = typeof options.key2 === 'number' ? options.key2 : KEY_2;
+        this.fr = new FileReader(archive);
+        this.key1 = typeof options.key1 === 'number' ? options.key1 : PW_KEY_1;
+        this.key2 = typeof options.key2 === 'number' ? options.key2 : PW_KEY_2;
     }
 
     public async init(): Promise<void> {
-        this.fr = new FileReader(this.archive);
         await this.fr.init();
         this.filesCount = await this.fr.setPointer(this.fr.length - 8).readInt32LE();
         this.fileTablePointer = (await this.fr.setPointer(this.fr.length - 272).readUInt32LE()) ^ this.key1;
@@ -34,6 +33,10 @@ export class PckReader {
         return this.fr.destroy();
     }
 
+    public async detectType(): Promise<void> {
+
+    }
+
     public async readFileTable(): Promise<void> {
         this.fr.setPointer(this.fileTablePointer);
         this.fileTable = [];
@@ -41,12 +44,12 @@ export class PckReader {
         for (let i = 0; i < this.filesCount; ++i) {
             this.fr.offset(4);
             const entrySize = (await this.fr.readInt32LE()) ^ this.key2;
-            const fileEntry = new FileTableEntry(await this.fr.read(entrySize));
+            const fileEntry = new PwFileTableEntry(await this.fr.read(entrySize));
             this.fileTable.push(fileEntry);
         }
     }
 
-    public async readFile(file: FileTableEntry): Promise<Buffer> {
+    public async readFile(file: PwFileTableEntry): Promise<Buffer> {
         const data = await this.fr.setPointer(file.dataOffset).read(file.dataCompressedSize);
 
         if (file.dataCompressedSize !== file.dataDecompressedSize) {

@@ -1,4 +1,4 @@
-export type FileTableEntryOptions = Buffer | {
+export type PwFileTableEntryOptions = Buffer | {
     path: string;
     dataOffset: number;
     dataDecompressedSize: number;
